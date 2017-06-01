@@ -26,7 +26,6 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {
-        console.log(1234)
         this._history = this.node.getChildByName("history");
         this._history.active = false;
         

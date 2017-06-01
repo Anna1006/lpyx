@@ -11,9 +11,9 @@ cc.Class({
         seats:null,
         turn:-1,
         button:-1,
-        // dingque:-1,
+        dingque:-1,
         chupai:-1,
-        // isDingQueing:false,
+        isDingQueing:false,
         isHuanSanZhang:false,
         gamestate:"",
         isOver:false,
@@ -32,11 +32,11 @@ cc.Class({
     reset:function(){
         this.turn = -1;
         this.chupai = -1,
-        // this.dingque = -1;
+        this.dingque = -1;
         this.button = -1;
         this.gamestate = "";
-        // this.dingque = -1;
-        // this.isDingQueing = false;
+        this.dingque = -1;
+        this.isDingQueing = false;
         this.isHuanSanZhang = false;
         this.curaction = null;
         for(var i = 0; i < this.seats.length; ++i){
@@ -47,7 +47,7 @@ cc.Class({
             this.seats[i].angangs = [];
             this.seats[i].diangangs = [];
             this.seats[i].wangangs = [];
-            // this.seats[i].dingque = -1;
+            this.seats[i].dingque = -1;
             this.seats[i].ready = false;
             this.seats[i].hued = false;
             this.seats[i].huanpais = null;
@@ -111,6 +111,7 @@ cc.Class({
             s.score = null;
             s.holds = baseInfo.game_seats[i];
             s.pengs = [];
+            s.chis = [];
             s.angangs = [];
             s.diangangs = [];
             s.wangangs = [];
@@ -190,8 +191,8 @@ cc.Class({
         cc.vv.net.addHandler("exit_result",function(data){
             self.roomId = null;
             self.turn = -1;
-            // self.dingque = -1;
-            // self.isDingQueing = false;
+            self.dingque = -1;
+            self.isDingQueing = false;
             self.seats = null;
         });
         
@@ -208,8 +209,8 @@ cc.Class({
         cc.vv.net.addHandler("dispress_push",function(data){
             self.roomId = null;
             self.turn = -1;
-            // self.dingque = -1;
-            // self.isDingQueing = false;
+            self.dingque = -1;
+            self.isDingQueing = false;
             self.seats = null;
         });
                 
@@ -270,6 +271,9 @@ cc.Class({
                 if(s.pengs == null){
                     s.pengs = [];
                 }
+                if(s.chis == null){
+                    s.chis = [];
+                }
                 if(s.angangs == null){
                     s.angangs = [];
                 }
@@ -304,12 +308,12 @@ cc.Class({
             console.log(data);
             self.numOfMJ = data.numofmj;
             self.gamestate = data.state;
-            // if(self.gamestate == "dingque"){
-            //     self.isDingQueing = true;
-            // }
-            // else if(self.gamestate == "huanpai"){
-            //     self.isHuanSanZhang = true;
-            // }
+            if(self.gamestate == "dingque"){
+                self.isDingQueing = true;
+            }
+            else if(self.gamestate == "huanpai"){
+                self.isHuanSanZhang = true;
+            }
             self.turn = data.turn;
             self.button = data.button;
             self.chupai = data.chuPai;
@@ -323,22 +327,23 @@ cc.Class({
                 seat.diangangs = sd.diangangs;
                 seat.wangangs = sd.wangangs;
                 seat.pengs = sd.pengs;
-                // seat.dingque = sd.que;
+                seat.chis = sd.chis;
+                seat.dingque = sd.que;
                 seat.hued = sd.hued; 
                 seat.iszimo = sd.iszimo;
                 seat.huinfo = sd.huinfo;
                 seat.huanpais = sd.huanpais;
                 if(i == self.seatIndex){
-                    // self.dingque = sd.que;
+                    self.dingque = sd.que;
                 }
            }
         });
         
-        // cc.vv.net.addHandler("game_dingque_push",function(data){
-        //     self.isDingQueing = true;
-        //     self.isHuanSanZhang = false;
-        //     self.dispatchEvent('game_dingque');
-        // });
+        cc.vv.net.addHandler("game_dingque_push",function(data){
+            self.isDingQueing = true;
+            self.isHuanSanZhang = false;
+            self.dispatchEvent('game_dingque');
+        });
         
         cc.vv.net.addHandler("game_huanpai_push",function(data){
             self.isHuanSanZhang = true;
@@ -461,6 +466,15 @@ cc.Class({
             var si = self.getSeatIndexByID(userId);
             self.doPeng(si,data.pai);
         });
+
+        cc.vv.net.addHandler("chi_notify_push",function(data){
+            console.log('chi_notify_push');
+            console.log(data)
+            var userId = data.userid;
+            var pai = data.pai;
+            var si = self.getSeatIndexByID(userId);
+            self.doChi(si,data.pai,data.chis,data.updateChi);
+        });
         
         cc.vv.net.addHandler("gang_notify_push",function(data){
             console.log('gang_notify_push');
@@ -471,16 +485,16 @@ cc.Class({
             self.doGang(si,pai,data.gangtype);
         });
         
-        // cc.vv.net.addHandler("game_dingque_notify_push",function(data){
-        //     self.dispatchEvent('game_dingque_notify',data);
-        // });
+        cc.vv.net.addHandler("game_dingque_notify_push",function(data){
+            self.dispatchEvent('game_dingque_notify',data);
+        });
         
-        // cc.vv.net.addHandler("game_dingque_finish_push",function(data){
-        //     for(var i = 0; i < data.length; ++i){
-        //         self.seats[i].dingque = data[i];
-        //     }
-        //     self.dispatchEvent('game_dingque_finish',data);
-        // });
+        cc.vv.net.addHandler("game_dingque_finish_push",function(data){
+            for(var i = 0; i < data.length; ++i){
+                self.seats[i].dingque = data[i];
+            }
+            self.dispatchEvent('game_dingque_finish',data);
+        });
         
         
         cc.vv.net.addHandler("chat_push",function(data){
@@ -556,48 +570,22 @@ cc.Class({
         this.dispatchEvent('peng_notify',seatData);
     },
 
-    doChi:function(seatIndex,pai){
+    doChi:function(seatIndex,pai,chisPai,updataChiArr){
         var seatData = this.seats[seatIndex];
-        var zhongvalue = [];
-        var leftvalue = [];
-        var rightvalue = [];
         //移除手牌
         if(seatData.holds){
-            for(var i=0;i<seatData.holds.length;++i){
-                if(pai >= 0 && pai < 9){
-                    //筒
-                    if(pai == 0){
-                        leftvalue.push(pai+1);
-                        leftvalue.push(pai+2);
-                    }else if(pai == 8){
-                        leftvalue.push(pai+1);
-                        leftvalue.push(pai+2);
-
-                        zhongvalue.push(pai-1);
-                        zhongvalue.push(pai+1);
-
-                        rightvalue.push(pai-1);
-                        rightvalue.push(pai-2);
-                    }else{
-                        rightvalue.push(pai-1);
-                        rightvalue.push(pai-2);
-                    }
+            for(var i = 0; i < 3; ++i){
+                if(chisPai[i] != pai){
+                    var idx = seatData.holds.indexOf(chisPai[i]);
+                    seatData.holds.splice(idx,1); 
                 }
-                else if(pai >= 9 && pai < 18){
-                    //条
-                }
-                else if(pai >= 18 && pai < 27){
-                    //万
-                }else if(pai >= 28 && pai < 34){
-                    //风
-                } 
-            }               
+            }                
         }
-            
         //更新碰牌数据
-        var chi = seatData.chi;
-        chi.push(pai);
-            
+        seatData.chisArr = chisPai;
+        seatData.updataChisArr = updataChiArr;
+        var chis = seatData.chis;
+        chis.push(pai);
         this.dispatchEvent('chi_notify',seatData);
     },
     

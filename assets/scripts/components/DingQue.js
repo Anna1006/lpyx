@@ -23,45 +23,33 @@ cc.Class({
             return;
         }
         this.initView();
-        // this.initDingQue();
-        // this.initEventHandlers();
+        this.initDingQue();
+        this.initEventHandlers();
     },
     
     initView:function(){
         var gameChild = this.node.getChildByName("game");
-        // this.queYiMen = gameChild.getChildByName("dingque");
-        // this.queYiMen.active = cc.vv.gameNetMgr.isDingQueing;
+        this.queYiMen = gameChild.getChildByName("dingque");
+        this.queYiMen.active = cc.vv.gameNetMgr.isDingQueing;
         
         var arr = ["myself","right","up","left"];
         for(var i = 0; i < arr.length; ++i){
             var side = gameChild.getChildByName(arr[i]);
             var seat = side.getChildByName("seat");
-            // var dingque = seat.getChildByName("que");
-            // this.dingques.push(dingque);
+            var dingque = seat.getChildByName("que");
+            this.dingques.push(dingque);
         }
-
-        // this.reset();
+        this.reset();
         
         var tips = this.queYiMen.getChildByName("tips");
         for(var i = 0; i < tips.childrenCount; ++i){
             var n = tips.children[i];
             this.tips.push(n.getComponent(cc.Label));
         }
-
-        for(var i = 0; i < this.tips.length; ++i){
-            var n = this.tips[i];
-            if(i > 0){
-                n.node.active = false;                
-            }
-            else{
-                n.node.active = true;
-            }
+        
+        if(cc.vv.gameNetMgr.gamestate == "dingque"){
+            this.showDingQueChoice();
         }
-        
-        
-        // if(cc.vv.gameNetMgr.gamestate == "dingque"){
-        //     this.showDingQueChoice();
-        // }
     },
     
     initEventHandlers:function(){
@@ -113,7 +101,7 @@ cc.Class({
             else{
                 node.getComponent(cc.Animation).stop();
             }
-            this.queYiMen.getChildByName(arr[i]).getChildByName('jian').active = minIndex == i;    
+            //this.queYiMen.getChildByName(arr[i]).getChildByName('jian').active = minIndex == i;    
         }
         
         this.reset();
@@ -148,48 +136,48 @@ cc.Class({
     },
     
     reset:function(){
-        // this.setInteractable(true);
+        this.setInteractable(true);
         
-        // this.selected.push(this.queYiMen.getChildByName("tong_selected"));
-        // this.selected.push(this.queYiMen.getChildByName("tiao_selected"));
-        // this.selected.push(this.queYiMen.getChildByName("wan_selected"));
-        // for(var i = 0; i < this.selected.length; ++i){
-        //     this.selected[i].active = false;
-        // }        
+        this.selected.push(this.queYiMen.getChildByName("tong_selected"));
+        this.selected.push(this.queYiMen.getChildByName("tiao_selected"));
+        this.selected.push(this.queYiMen.getChildByName("wan_selected"));
+        for(var i = 0; i < this.selected.length; ++i){
+            this.selected[i].active = false;
+        }        
         
-        // for(var i = 0; i < this.dingques.length; ++i){
-        //     for(var j = 0; j < this.dingques[i].children.length; ++j){
-        //         this.dingques[i].children[j].active = false;    
-        //     }
-        // }
+        for(var i = 0; i < this.dingques.length; ++i){
+            for(var j = 0; j < this.dingques[i].children.length; ++j){
+                this.dingques[i].children[j].active = false;    
+            }
+        }
     },
     
     onQueYiMenClicked:function(event){
-        // var type = 0;
-        // if(event.target.name == "tong"){
-        //     type = 0;
-        // }
-        // else if(event.target.name == "tiao"){
-        //     type = 1;
-        // }
-        // else if(event.target.name == "wan"){
-        //     type = 2;
-        // }
+        var type = 0;
+        if(event.target.name == "tong"){
+            type = 0;
+        }
+        else if(event.target.name == "tiao"){
+            type = 1;
+        }
+        else if(event.target.name == "wan"){
+            type = 2;
+        }
         
-        // for(var i = 0; i < this.selected.length; ++i){
-        //     this.selected[i].active = false;
-        // }  
-        // this.selected[type].active = true;
-        // cc.vv.gameNetMgr.dingque = type;
-        // cc.vv.net.send("dingque",type);
+        for(var i = 0; i < this.selected.length; ++i){
+            this.selected[i].active = false;
+        }  
+        this.selected[type].active = true;
+        cc.vv.gameNetMgr.dingque = type;
+        cc.vv.net.send("dingque",type);
         
         //this.setInteractable(false);
     },
     
     setInteractable:function(value){
-        // this.queYiMen.getChildByName("tong").getComponent(cc.Button).interactable = value;
-        // this.queYiMen.getChildByName("tiao").getComponent(cc.Button).interactable = value;
-        // this.queYiMen.getChildByName("wan").getComponent(cc.Button).interactable = value;        
+        this.queYiMen.getChildByName("tong").getComponent(cc.Button).interactable = value;
+        this.queYiMen.getChildByName("tiao").getComponent(cc.Button).interactable = value;
+        this.queYiMen.getChildByName("wan").getComponent(cc.Button).interactable = value;        
     }
 
     // called every frame, uncomment this function to activate update callback

@@ -253,7 +253,7 @@ cc.Class({
                 hupai = userData.holds.pop();
             }
             
-            cc.vv.mahjongmgr.sortMJ(userData.holds);
+            cc.vv.mahjongmgr.sortMJ(userData.holds,userData.dingque);
             
             //胡牌不参与排序
             if(hued){
@@ -310,6 +310,16 @@ cc.Class({
                 for(var k = 0; k < pengs.length; ++k){
                     var mjid = pengs[k];
                     this.initPengAndGangs(seatView,index,mjid,"peng");
+                    index++;    
+                }    
+            }
+
+            //初始化吃牌
+            var chis = userData.chis
+            if(chis){
+                for(var k = 0; k < chis.length; ++k){
+                    var mjid = chis[k];
+                    this.initPengAndGangs(seatView,index,mjid,"chi");
                     index++;    
                 }    
             }
@@ -514,7 +524,7 @@ cc.Class({
                 n.active = false;
             }
             
-            cc.vv.mahjongmgr.sortMJ(userData.holds);
+            cc.vv.mahjongmgr.sortMJ(userData.holds,userData.dingque);
             
             var numOfGangs = userData.angangs.length + userData.wangangs.length + userData.diangangs.length;
            
@@ -562,6 +572,16 @@ cc.Class({
                 for(var k = 0; k < pengs.length; ++k){
                     var mjid = pengs[k];
                     this.initPengAndGangs(seatView,index,mjid,"peng");
+                    index++;    
+                }    
+            }
+
+            //初始化吃牌
+            var chis = userData.chis
+            if(chis){
+                for(var k = 0; k < chis.length; ++k){
+                    var mjid = chis[k];
+                    this.initPengAndGangs(seatView,index,mjid,"chi");
                     index++;    
                 }    
             }

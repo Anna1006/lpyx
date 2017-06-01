@@ -39,6 +39,7 @@ var Global = cc.Class({
                 'transports':['websocket', 'polling']
             }
             this.sio = window.io.connect(this.ip,opts);
+
             this.sio.on('reconnect',function(){
                 console.log('reconnection');
             });
@@ -98,6 +99,7 @@ var Global = cc.Class({
                 },5000);
             }   
         },
+
         send:function(event,data){
             if(this.sio.connected){
                 if(data != null && (typeof(data) == "object")){

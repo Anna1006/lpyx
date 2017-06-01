@@ -3,6 +3,7 @@ var ACTION_MOPAI = 2;
 var ACTION_PENG = 3;
 var ACTION_GANG = 4;
 var ACTION_HU = 5;
+var ACTION_CHI = 5;
 
 
 cc.Class({
@@ -61,7 +62,7 @@ cc.Class({
     takeAction:function(){
         var action = this.getNextAction();
         if(this._lastAction != null && this._lastAction.type == ACTION_CHUPAI){
-            if(action != null && action.type != ACTION_PENG && action.type != ACTION_GANG && action.type != ACTION_HU){
+            if(action != null && action.type != ACTION_PENG && action.type != ACTION_GANG && action.type != ACTION_HU && action != null && action.type != ACTION_CHI){
                 cc.vv.gameNetMgr.doGuo(this._lastAction.si,this._lastAction.pai);
             }
         }
@@ -82,6 +83,12 @@ cc.Class({
             return 0.5;
         }
         else if(action.type == ACTION_PENG){
+            //console.log("peng");
+            cc.vv.gameNetMgr.doPeng(action.si,action.pai);
+            cc.vv.gameNetMgr.doTurnChange(action.si);
+            return 1.0;
+        }
+        else if(action.type == ACTION_CHI){
             //console.log("peng");
             cc.vv.gameNetMgr.doPeng(action.si,action.pai);
             cc.vv.gameNetMgr.doTurnChange(action.si);

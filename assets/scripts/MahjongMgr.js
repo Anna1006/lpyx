@@ -72,16 +72,17 @@ cc.Class({
             mahjongSprites.push("character_" + i);
         }
         
-        //中、发、白
-        mahjongSprites.push("red");
-        mahjongSprites.push("green");
-        mahjongSprites.push("white");
         
         //东西南北风
         mahjongSprites.push("wind_east");
         mahjongSprites.push("wind_west");
         mahjongSprites.push("wind_south");
         mahjongSprites.push("wind_north");
+        
+        //中、发、白
+        mahjongSprites.push("red");
+        mahjongSprites.push("green");
+        mahjongSprites.push("white");
     },
     
     getMahjongSpriteByID:function(id){
@@ -98,7 +99,7 @@ cc.Class({
       else if(id >= 18 && id < 27){
           return 2;
       }
-      else if(id >= 28 && id < 34){
+      else if(id >= 27 && id < 34){
           return 3;
       }
     },
@@ -121,6 +122,19 @@ cc.Class({
     },
     
     getAudioURLByMJID:function(id){
+        // var realId = 0;
+        // if(id >= 0 && id < 9){
+        //     realId = id + 21;
+        // }
+        // else if(id >= 9 && id < 18){
+        //     realId = id - 8;
+        // }
+        // else if(id >= 18 && id < 27){
+        //     realId = id - 7;
+        // }
+        // else if(id >= 27 && id < 33){
+        //     realId = id - 7;
+        // }
         return "nvsheng/mj_" + id + ".mp3";
     },
     
@@ -157,21 +171,18 @@ cc.Class({
     sortMJ:function(mahjongs,dingque){
         var self = this;
         mahjongs.sort(function(a,b){
-            // if(dingque >= 0){
-            //     var t1 = self.getMahjongType(a);
-            //     var t2 = self.getMahjongType(b);
-            //     if(t1 != t2){
-            //         if(dingque == t1){
-            //             return 1;
-            //         }
-            //         else if(dingque == t2){
-            //             return -1;
-            //         }
-            //     }
-            // }
-
-            var t1 = self.getMahjongType(a);
-            var t2 = self.getMahjongType(b);
+            if(dingque >= 0){
+                var t1 = self.getMahjongType(a);
+                var t2 = self.getMahjongType(b);
+                if(t1 != t2){
+                    if(dingque == t1){
+                        return 1;
+                    }
+                    else if(dingque == t2){
+                        return -1;
+                    }
+                }
+            }
             return a - b;
         });
     },

@@ -35,6 +35,12 @@ cc.Class({
             self.onPengGangChanged(data);
         });
         
+        this.node.on('chi_notify',function(data){
+            //刷新所有的牌
+            var data = data.detail;
+            self.onPengGangChanged(data);
+        });
+
         this.node.on('gang_notify',function(data){
             //刷新所有的牌
             //console.log(data.detail);
@@ -71,8 +77,7 @@ cc.Class({
     },
     
     onPengGangChanged:function(seatData){
-        
-        if(seatData.angangs == null && seatData.diangangs == null && seatData.wangangs == null && seatData.pengs == null){
+        if(seatData.angangs == null && seatData.diangangs == null && seatData.wangangs == null && seatData.pengs == null && seatData.chis == null){
             return;
         }
         var localIndex = cc.vv.gameNetMgr.getLocalIndex(seatData.seatindex);
@@ -119,10 +124,21 @@ cc.Class({
                 this.initPengAndGangs(pengangroot,side,pre,index,mjid,"peng");
                 index++;    
             }    
-        }        
+        }  
+
+        //初始化吃牌
+        var chis = seatData.chis
+        if(chis){
+            for(var i = 0; i < chis.length; ++i){
+                var mjid = chis[i];
+                this.initPengAndGangs(pengangroot,side,pre,index,mjid,"chi",seatData.chisArr,seatData.updataChisArr[i]);
+                index++;    
+            }    
+        } 
+
     },
     
-    initPengAndGangs:function(pengangroot,side,pre,index,mjid,flag){
+    initPengAndGangs:function(pengangroot,side,pre,index,mjid,flag,chisArr,updataChisArr){
         var pgroot = null;
         if(pengangroot.childrenCount <= index){
             if(side == "left" || side == "right"){
@@ -154,6 +170,7 @@ cc.Class({
         }
 
         var sprites = pgroot.getComponentsInChildren(cc.Sprite);
+
         for(var s = 0; s < sprites.length; ++s){
             var sprite = sprites[s];
             if(sprite.node.name == "gang"){
@@ -168,12 +185,20 @@ cc.Class({
                         sprite.node.scaleY = 1.4;                        
                     }
                 }   
+                else if(flag == "chi" || flag == "peng"){
+                    sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID(pre,"");     
+                } 
                 else{
-                    sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID(pre,mjid);    
-                }
+                    sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID(pre,mjid);
+                }   
             }
             else{ 
-                sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID(pre,mjid);
+                if(flag == "chi"){
+                    var arrSort = chisArr.sort();
+                    sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID(pre,updataChisArr[s]);
+                }else{
+                    sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID(pre,mjid);
+                }
             }
         }
     },

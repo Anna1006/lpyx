@@ -36,7 +36,7 @@ cc.Class({
         }
         this.addComponent("NoticeTip");
         this.addComponent("GameOver");
-        // this.addComponent("DingQue");
+        this.addComponent("DingQue");
         this.addComponent("PengGangs");
         this.addComponent("MJRoom");
         this.addComponent("TimePointer");
@@ -219,7 +219,7 @@ cc.Class({
                 self.playEfx(localIndex,"play_hu");
             }
             
-            cc.vv.audioMgr.playSFX("nv/hu.mp3");
+            cc.vv.audioMgr.playSFX("nvsheng/mj_hu.mp3");
         });
         
         this.node.on('mj_count',function(data){
@@ -266,13 +266,12 @@ cc.Class({
             self.hideOptions();
         });
         
-        // this.node.on('game_dingque_finish',function(data){
-        //     self.initMahjongs();
-        // });
+        this.node.on('game_dingque_finish',function(data){
+            self.initMahjongs();
+        });
         
-        this.node.on('peng_notify',function(data){    
+        this.node.on('peng_notify',function(data){  
             self.hideChupai();
-            
             var seatData = data.detail;
             if(seatData.seatindex == cc.vv.gameNetMgr.seatIndex){
                 self.initMahjongs();                
@@ -282,7 +281,22 @@ cc.Class({
             }
             var localIndex = self.getLocalIndex(seatData.seatindex);
             self.playEfx(localIndex,"play_peng");
-            cc.vv.audioMgr.playSFX("nv/peng.mp3");
+            cc.vv.audioMgr.playSFX("nvsheng/mj_peng.mp3");
+            self.hideOptions();
+        });
+
+        this.node.on('chi_notify',function(data){  
+            self.hideChupai(); 
+            var seatData = data.detail;
+            if(seatData.seatindex == cc.vv.gameNetMgr.seatIndex){
+                self.initMahjongs();                
+            }
+            else{
+                self.initOtherMahjongs(seatData);
+            }
+            var localIndex = self.getLocalIndex(seatData.seatindex);
+            self.playEfx(localIndex,"play_chi");
+            cc.vv.audioMgr.playSFX("nvsheng/mj_chi.mp3");
             self.hideOptions();
         });
         
@@ -313,7 +327,7 @@ cc.Class({
             var data = data.detail;
             var localIndex = self.getLocalIndex(data);
             self.playEfx(localIndex,"play_gang");
-            cc.vv.audioMgr.playSFX("nv/gang.mp3");
+            cc.vv.audioMgr.playSFX("nvsheng/mj_gang.mp3");
             self.hideOptions();
         });
     },
@@ -321,7 +335,6 @@ cc.Class({
     showChupai:function(){
         var pai = cc.vv.gameNetMgr.chupai; 
         if( pai >= 0 ){
-            //
             var localIndex = this.getLocalIndex(cc.vv.gameNetMgr.turn);
             var sprite = this._chupaiSprite[localIndex];
             sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID("M_",pai);
@@ -329,18 +342,70 @@ cc.Class({
         }
     },
     
-    addOption:function(btnName,pai){
+    addOption:function(btnName,pai,chis){
         for(var i = 0; i < this._options.childrenCount; ++i){
             var child = this._options.children[i]; 
             if(child.name == "op" && child.active == false){
                 child.active = true;
-                var sprite = child.getChildByName("opTarget").getComponent(cc.Sprite);
-                sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID("M_",pai);
-                var btn = child.getChildByName(btnName); 
+                var btn = child.getChildByName(btnName);
+                
+                console.log("有多少")
+                // console.log(btnChiArr.length)
                 btn.active = true;
                 btn.pai = pai;
-                return;
+                break;
             }
+        }
+        
+
+        
+
+        if(btnName == "btnChi" && btn.active == true){
+            var children = btn.children;
+            for (var i = 0; i < chis.length; ++i) {
+                children[i].active = true;
+                var sprites = children[i].getComponentsInChildren(cc.Sprite);
+                cc.log(sprites.length);
+                cc.log(chis[i])
+                for(var j=0;j<chis[i].length;++j){
+                    sprites[j].spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID("M_",chis[i][j]);
+                }
+            }
+
+            // for(var i =0;i< chis.length ;++i){
+            //     var pengangroot = child.getChildByName(btnName);
+            //     // var btnChiArr = pengangroot.getChildByName("btnChiArr");
+            //     // console.log(btnChiArr.length)
+
+            //     // btnChiArr[i].active = true;
+            //     // var sprites = btnChiArr.getComponentsInChildren(cc.Sprite);
+            //     // for(var m =0; m <chis[i].length;++m){
+            //     //     var sprite = sprites[m];
+            //     //     sprite.spriteFrame = "M_"+ m;
+            //     // }
+
+            //     var realwidth = cc.director.getVisibleSize().width;
+            //     var scale = realwidth / 1280;
+            //     pengangroot.scaleX *= scale;
+            //     pengangroot.scaleY *= scale;
+            //     var pgroot = cc.instantiate(cc.vv.mahjongmgr.pengPrefabSelf);
+            //     pgroot.x = -(i * 75*3)-i*50;
+            //     var sprites = pgroot.getComponentsInChildren(cc.Sprite);
+            //     for(var m =0; m <sprites.length;++m){
+            //         var sprite = sprites[m];
+            //         if(chis[i][m] != undefined){
+            //             sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID("M_",chis[i][m]);
+            //         }else{
+            //             sprite.spriteFrame = cc.vv.mahjongmgr.getSpriteFrameByMJID("M_","");
+            //         }
+            //     }
+            //     pengangroot.addChild(pgroot);
+            //     pgroot.on("mousedown",function(event){  
+            //         console.log("执行了没有");
+            //         console.log(event)
+            //         this.onOptionClicked();
+            //     });
+            // }
         }
     },
     
@@ -350,6 +415,11 @@ cc.Class({
             var child = this._options.children[i]; 
             if(child.name == "op"){
                 child.active = false;
+                child.getChildByName("btnChi").active = false;
+                child.getChildByName("btnChi").children[0].active = false;
+                child.getChildByName("btnChi").children[1].active = false;
+                child.getChildByName("btnChi").children[2].active = false;
+
                 child.getChildByName("btnPeng").active = false;
                 child.getChildByName("btnGang").active = false;
                 child.getChildByName("btnHu").active = false;
@@ -362,7 +432,7 @@ cc.Class({
             this.hideOptions();
         }
         
-        if(data && (data.hu || data.gang || data.peng)){
+        if(data && (data.hu || data.gang || data.peng || data.chi)){
             this._options.active = true;
             if(data.hu){
                 this.addOption("btnHu",data.pai);
@@ -370,7 +440,9 @@ cc.Class({
             if(data.peng){
                 this.addOption("btnPeng",data.pai);
             }
-            
+            if(data.chi && data.chis != []){
+                this.addOption("btnChi",data.pai,data.chis);
+            }
             if(data.gang){
                 for(var i = 0; i < data.gangpai.length;++i){
                     var gp = data.gangpai[i];
@@ -597,7 +669,7 @@ cc.Class({
         var game = this.node.getChildByName("game");
         var sideRoot = game.getChildByName(side);
         var sideHolds = sideRoot.getChildByName("holds");
-        var num = seatData.pengs.length + seatData.angangs.length + seatData.diangangs.length + seatData.wangangs.length;
+        var num = seatData.pengs.length + seatData.chis.length + seatData.angangs.length + seatData.diangangs.length + seatData.wangangs.length;
         num *= 3;
         for(var i = 0; i < num; ++i){
             var idx = this.getMJIndex(side,i);
@@ -637,8 +709,8 @@ cc.Class({
             mopai = holds.pop();
         }
         
-        // var dingque = seatData.dingque;
-        cc.vv.mahjongmgr.sortMJ(holds);
+        var dingque = seatData.dingque;
+        cc.vv.mahjongmgr.sortMJ(holds,dingque);
         
         //将摸牌添加到最后
         if(mopai != null){
@@ -656,7 +728,7 @@ cc.Class({
         }
         
         //初始化手牌
-        var lackingNum = (seatData.pengs.length + seatData.angangs.length + seatData.diangangs.length + seatData.wangangs.length)*3;
+        var lackingNum = (seatData.pengs.length + seatData.chis.length + seatData.angangs.length + seatData.diangangs.length + seatData.wangangs.length)*3;
         for(var i = 0; i < holds.length; ++i){
             var mjid = holds[i];
             var sprite = this._myMJArr[i + lackingNum];
@@ -687,24 +759,20 @@ cc.Class({
     checkQueYiMen:function(){
         if(cc.vv.gameNetMgr.conf==null || cc.vv.gameNetMgr.conf.type != "xlch" || !cc.vv.gameNetMgr.getSelfData().hued){
             //遍历检查看是否有未打缺的牌 如果有，则需要将不是定缺的牌设置为不可用
-            // var dingque = cc.vv.gameNetMgr.dingque;
-    //        console.log(dingque)
+            var dingque = cc.vv.gameNetMgr.dingque;
             var hasQue = false;
             if(cc.vv.gameNetMgr.seatIndex == cc.vv.gameNetMgr.turn){
                 for(var i = 0; i < this._myMJArr.length; ++i){
                     var sprite = this._myMJArr[i];
-    //                console.log("sprite.node.mjId:" + sprite.node.mjId);
                     if(sprite.node.mjId != null){
                         var type = cc.vv.mahjongmgr.getMahjongType(sprite.node.mjId);
-                        // if(type == dingque){
-                        //     hasQue = true;
-                        //     break;
-                        // }
+                        if(type == dingque){
+                            hasQue = true;
+                            break;
+                        }
                     }
                 }            
             }
-
-    //        console.log("hasQue:" + hasQue);
             for(var i = 0; i < this._myMJArr.length; ++i){
                 var sprite = this._myMJArr[i];
                 if(sprite.node.mjId != null){
@@ -745,12 +813,17 @@ cc.Class({
     },
     
     onOptionClicked:function(event){
-        console.log(event.target.pai);
+        console.log("这里是选择吃的地方");
         if(event.target.name == "btnPeng"){
             cc.vv.net.send("peng");
         }
         else if(event.target.name == "btnGang"){
             cc.vv.net.send("gang",event.target.pai);
+        }
+        else if(event.target.name == "btnChiArr"){
+            var eChildren = event.target.children;
+            var num = parseInt(eChildren[0].name.substring(eChildren[0].name.length-1,eChildren[0].name.length));
+            cc.vv.net.send("chi",cc.vv.gameNetMgr.curaction.chis[num]);
         }
         else if(event.target.name == "btnHu"){
             cc.vv.net.send("hu");
